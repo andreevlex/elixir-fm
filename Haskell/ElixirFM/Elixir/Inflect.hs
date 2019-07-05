@@ -28,6 +28,7 @@ import Elixir.Pretty
 
 import Data.List
 
+import Encode.Arabic
 
 instance (Show a, Template a) => Pretty [(String, [(ParaType, [(Root, Morphs a)])])] where
 
@@ -42,10 +43,15 @@ instance (Show a, Template a) => Pretty (String, [(ParaType, [(Root, Morphs a)])
 
                             text "\t" <> fill 10 empty )
 
-                            [ joinText [merge u v, show u, show v] | (u, v) <- f ]
+                            [ joinText [merge u v, show u, show v, show_arabic (merged), show_buckwalter (merged)] | (u, v) <- f, let merged = merge u v]
 
                         ) | (t, f) <- y, not (null f) ] )
 
+show_arabic::String -> String
+show_arabic = encode UTF . decode ArabTeX . encode UCS . decode UTF
+
+show_buckwalter::String -> String
+show_buckwalter = encode UTF . decode UCS . encode Buckwalter . decode ArabTeX . encode UCS . decode UTF
 
 instance (Show a, Template a) => Pretty [(ParaType, [(Root, Morphs a)])] where
 
